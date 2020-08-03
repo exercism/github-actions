@@ -1,0 +1,8 @@
+name: "Fetch configlet"
+description: "Run a simple composite action"
+runs:
+    using: "composite"
+    steps: 
+        - run: echo hello foo bar
+        - run: echo is this real life?
+        
