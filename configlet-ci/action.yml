@@ -9,6 +9,7 @@ runs:
   using: "composite"
   steps: 
   - run: chmod +x ${{ github.action_path }}/fetch-configlet
+    shell: bash
   - run: ${{ github.action_path }}/fetch-configlet
     shell: bash
   - run: ./bin/configlet lint .
