@@ -9,8 +9,6 @@ runs:
   using: "composite"
   steps: 
   - run: ./${{ github.action_path }}/fetch-configlet
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     shell: bash
   - run: ./bin/configlet lint .
     shell: bash
