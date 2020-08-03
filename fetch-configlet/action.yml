@@ -4,5 +4,7 @@ runs:
     using: "composite"
     steps: 
         - run: echo hello foo bar
+          shell: bash
         - run: echo is this real life?
+          shell: bash
         
