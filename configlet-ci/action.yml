@@ -1,0 +1,16 @@
+name: 'Configlet CI'
+description: 'Run the configlet checks'
+author: 'Sascha Mann'
+branding:
+  icon: 'download'
+  color: 'purple'
+  
+runs:
+  using: "composite"
+  steps: 
+  - run: ./${{ github.action_path }}/fetch-configlet
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    shell: bash
+  - run: ./bin/configlet lint .
+    shell: bash
