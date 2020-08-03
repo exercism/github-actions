@@ -1,0 +1,13 @@
+name: Composite Action
+on:
+  push:
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    - uses: actions/checkout@v2
+    - uses: ./fetch-configlet
+    - name: step 1
+      run: echo Workflow step 1
+    - name: step 2
+      run: echo Workflow step 2
