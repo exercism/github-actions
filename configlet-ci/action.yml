@@ -14,3 +14,5 @@ runs:
     shell: bash
   - run: ./bin/configlet lint .
     shell: bash
+  - run: ./bin/configlet tree . --with-difficulty
+    shell: bash
