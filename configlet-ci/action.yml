@@ -1,5 +1,5 @@
-name: 'Configlet CI'
-description: 'Run the configlet checks'
+name: 'Fetch configlet'
+description: 'Download configlet and add it to the path'
 author: 'Sascha Mann'
 branding:
   icon: 'download'
@@ -7,10 +7,8 @@ branding:
   
 runs:
   using: "composite"
-  steps: 
-  - run: chmod +x ${{ github.action_path }}/fetch-configlet
-    shell: bash
+  steps:
   - run: ${{ github.action_path }}/fetch-configlet
     shell: bash
-  - run: ./bin/configlet lint .
+  - run: echo bin/configlet >> $GITHUB_PATH
     shell: bash
