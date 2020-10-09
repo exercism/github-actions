@@ -10,5 +10,7 @@ runs:
   steps:
   - run: ${{ github.action_path }}/fetch-configlet
     shell: bash
+  - run: chmod +x bin/configlet
+    shell: bash
   - run: echo "$PWD/bin/configlet" >> $GITHUB_PATH
     shell: bash
