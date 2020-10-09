@@ -12,5 +12,5 @@ runs:
     shell: bash
   - run: chmod +x bin/configlet
     shell: bash
-  - run: echo "$PWD/bin/configlet" >> $GITHUB_PATH
+  - run: echo "$PWD/bin" >> $GITHUB_PATH
     shell: bash
