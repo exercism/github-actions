@@ -1,0 +1,16 @@
+name: "Fetch canonical data syncer"
+description: "Download canonical data syncer and add it to the path"
+author: "Erik Schierboom"
+branding:
+  icon: "download"
+  color: "purple"
+
+runs:
+  using: "composite"
+  steps:
+    - run: ${{ github.action_path }}/fetch-canonical_data_syncer
+      shell: bash
+    - run: chmod +x bin/canonical_data_syncer
+      shell: bash
+    - run: echo "$PWD/bin" >> $GITHUB_PATH
+      shell: bash
