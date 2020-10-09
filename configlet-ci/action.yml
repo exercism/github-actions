@@ -1,0 +1,16 @@
+name: 'Fetch configlet'
+description: 'Download configlet and add it to the path'
+author: 'Sascha Mann'
+branding:
+  icon: 'download'
+  color: 'purple'
+  
+runs:
+  using: "composite"
+  steps:
+  - run: ${{ github.action_path }}/fetch-configlet
+    shell: bash
+  - run: chmod +x bin/configlet
+    shell: bash
+  - run: echo "$PWD/bin" >> $GITHUB_PATH
+    shell: bash
