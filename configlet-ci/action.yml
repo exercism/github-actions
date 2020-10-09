@@ -8,7 +8,6 @@ branding:
 runs:
   using: "composite"
   steps:
-  - run: echo "HELLO!????"
   - run: ${{ github.action_path }}/fetch-configlet
     shell: bash
   - run: chmod +x bin/configlet
