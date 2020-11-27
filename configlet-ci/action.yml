@@ -8,6 +8,8 @@ branding:
 runs:
   using: "composite"
   steps:
+  - run: mkdir -p bin/
+    shell: bash
   - run: ${{ github.action_path }}/fetch-configlet
     shell: bash
   - run: chmod +x bin/configlet
