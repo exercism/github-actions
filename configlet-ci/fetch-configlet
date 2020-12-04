@@ -4,9 +4,9 @@ get_download_url() {
   # Returns the download URL of the latest configlet Linux release from the GitHub API
   local api_url='https://api.github.com/repos/exercism/configlet/releases/latest'
   local asset_name='configlet-linux-64bit.tgz'
-  curl -s "${api_url}" |
+  curl -sSf "${api_url}" |
     jq --arg name "${asset_name}" -r '.assets[] | select(.name==$name).browser_download_url'
 }
 
 download_url="$(get_download_url)"
-curl -sL "${download_url}" | tar xz -C bin/
+curl -sSfL "${download_url}" | tar xz -C bin/
