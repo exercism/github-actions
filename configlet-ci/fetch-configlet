@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 get_download_url() {
   # Returns the download URL of the latest configlet Linux release from the GitHub API
