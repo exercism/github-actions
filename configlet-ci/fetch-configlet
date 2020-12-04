@@ -1,13 +1,19 @@
 #!/bin/bash
 set -euo pipefail
 
+curlopts=(
+  --silent
+  --show-error
+  --fail
+)
+
 get_download_url() {
   # Returns the download URL of the latest configlet Linux release from the GitHub API
   local api_url='https://api.github.com/repos/exercism/configlet/releases/latest'
   local asset_name='configlet-linux-64bit.tgz'
-  curl -H "Accept: application/vnd.github.v3+json" -sSf "${api_url}" |
+  curl "${curlopts[@]}" --header "Accept: application/vnd.github.v3+json" "${api_url}" |
     jq --arg name "${asset_name}" -r '.assets[] | select(.name==$name).browser_download_url'
 }
 
 download_url="$(get_download_url)"
-curl -sSfL "${download_url}" | tar xz -C bin/
+curl "${curlopts[@]}" --location "${download_url}" | tar xz -C bin/
