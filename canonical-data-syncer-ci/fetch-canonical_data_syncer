@@ -2,6 +2,8 @@
 
 curlopts=(
   --silent
+  --show-error
+  --fail
 )
 
 get_download_url() {
