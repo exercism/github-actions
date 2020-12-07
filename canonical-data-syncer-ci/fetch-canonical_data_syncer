@@ -4,13 +4,13 @@ curlopts=(
   --silent
 )
 
-# https://gist.github.com/lukechilds/a83e1d7127b78fef38c2914c4ececc3c
-get_latest_release() {
-  curl "${curlopts[@]}" "https://api.github.com/repos/$1/releases/latest" | # Get latest release from GitHub api
-    grep '"tag_name":' |                                            # Get tag line
-    sed -E 's/.*"([^"]+)".*/\1/'                                    # Pluck JSON value
+get_download_url() {
+  # Returns the download URL of the latest Linux release from the GitHub API
+  local api_url='https://api.github.com/repos/exercism/canonical-data-syncer/releases/latest'
+  local asset_name='canonical_data_syncer-linux-64bit.tgz'
+  curl "${curlopts[@]}" "${api_url}" |
+    jq --arg name "${asset_name}" -r '.assets[] | select(.name==$name).browser_download_url'
 }
 
-URL="https://github.com/exercism/canonical-data-syncer/releases/download/$(get_latest_release "exercism/canonical-data-syncer")/canonical_data_syncer-linux-64bit.tgz"
-
-curl "${curlopts[@]}" --location "$URL" | tar xz -C bin/
+download_url="$(get_download_url)"
+curl "${curlopts[@]}" --location "${download_url}" | tar xz -C bin/
