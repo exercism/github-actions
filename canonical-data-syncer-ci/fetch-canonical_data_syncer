@@ -10,7 +10,7 @@ get_download_url() {
   # Returns the download URL of the latest Linux release from the GitHub API
   local api_url='https://api.github.com/repos/exercism/canonical-data-syncer/releases/latest'
   local asset_name='canonical_data_syncer-linux-64bit.tgz'
-  curl "${curlopts[@]}" "${api_url}" |
+  curl "${curlopts[@]}" --header "Accept: application/vnd.github.v3+json" "${api_url}" |
     jq --arg name "${asset_name}" -r '.assets[] | select(.name==$name).browser_download_url'
 }
 
