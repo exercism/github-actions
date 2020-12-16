@@ -1,0 +1,13 @@
+name: "List PR files"
+description: "List pull request files"
+inputs:
+  ghToken:
+    description: "The github token"
+    default: ${{ github.token }}
+    required: true
+outputs:
+  files:
+    description: "The stringified array containing the name of all files in the pull request"
+runs:
+  using: "node12"
+  main: "dist/index.js"
