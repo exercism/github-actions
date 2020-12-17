@@ -1,7 +1,7 @@
 name: "List PR files"
 description: "List pull request files"
 inputs:
-  ghToken:
+  token:
     description: "The github token"
     default: ${{ github.token }}
     required: true

@@ -3,7 +3,7 @@ const github = require("@actions/github");
 
 async function main() {
   try {
-    const token = core.getInput("ghToken");
+    const token = core.getInput("token");
     const githubClient = new github.GitHub(token);
 
     const contextPayload = github.context.payload;
