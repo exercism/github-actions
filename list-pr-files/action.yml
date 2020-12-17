@@ -2,7 +2,7 @@ name: "List PR files"
 description: "List pull request files"
 inputs:
   token:
-    description: "The github token"
+    description: Access token used to authenticate with the GitHub API.
     default: ${{ github.token }}
     required: true
 outputs:
