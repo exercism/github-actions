@@ -1,13 +1,20 @@
 name: "List PR files"
 description: "List pull request files"
+
+branding:
+  icon: list
+  color: green
+
 inputs:
   token:
     description: Access token used to authenticate with the GitHub API.
     default: ${{ github.token }}
     required: false
+
 outputs:
   files:
     description: "The stringified array containing the name of all files in the pull request"
+
 runs:
   using: "node12"
   main: "dist/index.js"
