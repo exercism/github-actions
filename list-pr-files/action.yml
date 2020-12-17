@@ -4,7 +4,7 @@ inputs:
   token:
     description: Access token used to authenticate with the GitHub API.
     default: ${{ github.token }}
-    required: true
+    required: false
 outputs:
   files:
     description: "The stringified array containing the name of all files in the pull request"
