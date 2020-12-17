@@ -1,10 +1,18 @@
 {
-  "name": "list-pr-files",
+  "name": "@exercism/list-pr-files-action",
   "version": "1.0.0",
   "description": "List pull request files",
   "main": "dist/index.js",
-  "repository": "git@github.com:matheuspiment/list-pr-files.git",
-  "author": "Matheus Ribeiro Pimenta Nunes <matheuspiment@hotmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:exercism/github-actions.git",
+    "directory": "list-pr-files"
+  },
+  "authors": [
+    "Matheus Ribeiro Pimenta Nunes <matheuspiment@hotmail.com>",
+    "Derk-Jan Karrenbeld <derk-jan+github@karrenbeld.info>",
+    "Sascha Mann <git@mail.saschamann.eu>"
+  ],
   "license": "MIT",
   "scripts": {
     "build": "ncc build src/index.js -o dist"
