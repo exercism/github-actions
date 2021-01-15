@@ -1,12 +1,20 @@
 #!/bin/bash
+set -euo pipefail
 
-# https://gist.github.com/lukechilds/a83e1d7127b78fef38c2914c4ececc3c
-get_latest_release() {
-  curl --silent "https://api.github.com/repos/$1/releases/latest" | # Get latest release from GitHub api
-    grep '"tag_name":' |                                            # Get tag line
-    sed -E 's/.*"([^"]+)".*/\1/'                                    # Pluck JSON value
+curlopts=(
+  --silent
+  --show-error
+  --fail
+  --location
+)
+
+get_download_url() {
+  # Returns the download URL of the v0.17.0 Linux release from the GitHub API
+  local api_url='https://api.github.com/repos/exercism/canonical-data-syncer/releases/33439231'
+  local asset_name='canonical_data_syncer-linux-64bit.tgz'
+  curl "${curlopts[@]}" --header "Accept: application/vnd.github.v3+json" "${api_url}" |
+    jq --arg name "${asset_name}" -r '.assets[] | select(.name==$name).browser_download_url'
 }
 
-URL="https://github.com/exercism/canonical-data-syncer/releases/download/$(get_latest_release "exercism/canonical-data-syncer")/canonical_data_syncer-linux-64bit.tgz"
-
-curl -s --location "$URL" | tar xz -C bin/
+download_url="$(get_download_url)"
+curl "${curlopts[@]}" "${download_url}" | tar xz -C bin/
