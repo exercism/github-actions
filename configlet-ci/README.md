@@ -26,6 +26,6 @@ jobs:
       uses: exercism/github-actions/configlet-ci@main
         
     - name: Configlet Linter
-      run: configlet lint .
+      run: configlet lint
 
 ```
