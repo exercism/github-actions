@@ -5,6 +5,7 @@ curlopts=(
   --silent
   --show-error
   --fail
+  --location
 )
 
 get_download_url() {
@@ -16,4 +17,4 @@ get_download_url() {
 }
 
 download_url="$(get_download_url)"
-curl "${curlopts[@]}" --location "${download_url}" | tar xz -C bin/
+curl "${curlopts[@]}" "${download_url}" | tar xz -C bin/
