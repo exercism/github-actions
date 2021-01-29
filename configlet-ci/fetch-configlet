@@ -6,6 +6,7 @@ curlopts=(
   --show-error
   --fail
   --location
+  --retry 3
 )
 
 get_download_url() {
