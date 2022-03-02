@@ -68,5 +68,35 @@ jobs:
       fmt: true
 ```
 
+## Reusable workflow: docker-build-push-image
+
+The `docker-build-push-image` reusable workflow can be used to easily build and push a repository's Docker image to AWS ECR and/or Docker Hub.
+
+### Inputs
+
+Which registry you want the built image to be pushed to can be enabled or disabled via two boolean inputs:
+
+| Name         | Description        | Type      | Required | Default |
+| ------------ | ------------------ | --------- | -------- | ------- |
+| `aws_ecr`    | Push to AWS ECR    | `boolean` | False    | `true`  |
+| `docker_hub` | Push to Docker Hub | `boolean` | False    | `true`  |
+
+### Secrets
+
+Which registry you want the built image to be pushed to can be enabled or disabled via two boolean inputs:
+
+| Name                        | Description                                           | Type     | Required |
+| --------------------------- | ----------------------------------------------------- | -------- | -------- |
+| `AWS_ACCOUNT_ID`            | The AWS account ID used to determine the ECR registry | `string` | Yes      |
+| `AWS_REGION`                | The AWS region used to determine the ECR registry     | `string` | Yes      |
+| `AWS_ECR_ACCESS_KEY_ID`     | The access key ID used to log into AWS ECR            | `string` | Yes      |
+| `AWS_ECR_SECRET_ACCESS_KEY` | The secret access key ID used to log into AWS ECR     | `string` | Yes      |
+| `DOCKERHUB_USERNAME`        | The username used to log into Docker Hub              | `string` | Yes      |
+| `DOCKERHUB_PASSWORD`        | The password used to log into Docker Hub              | `string` | Yes      |
+
+### Example: default (push to AWS ECR and Docker Hub)
+
+TODO
+
 [configlet]: https://exercism.org/docs/building/configlet
 [configlet-lint]: https://exercism.org/docs/building/configlet/lint
