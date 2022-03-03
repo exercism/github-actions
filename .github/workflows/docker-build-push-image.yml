@@ -17,27 +17,21 @@ on:
       AWS_ACCOUNT_ID:
         description: "The AWS account ID used to determine the ECR registry"
         required: true
-        type: string
       AWS_REGION:
         description: "The AWS region used to determine the ECR registry"
         required: true
-        type: string
       AWS_ECR_ACCESS_KEY_ID:
         description: "The access key ID used to log into AWS ECR"
         required: true
-        type: string
       AWS_ECR_SECRET_ACCESS_KEY:
         description: "The secret access key ID used to log into AWS ECR"
         required: true
-        type: string
       DOCKERHUB_USERNAME:
         description: "The username used to log into Docker Hub"
         required: true
-        type: string
       DOCKERHUB_PASSWORD:
         description: "The password used to log into Docker Hub"
         required: true
-        type: string
 
 permissions:
   contents: write
