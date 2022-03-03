@@ -96,7 +96,94 @@ Which registry you want the built image to be pushed to can be enabled or disabl
 
 ### Example: default (push to AWS ECR and Docker Hub)
 
-TODO
+```yaml
+name: Build and Push Docker image
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-push-image:
+    uses: exercism/github-actions/.github/workflows/docker-build-push-image.yml@main
+    secrets:
+      AWS_ACCOUNT_ID: ${{secrets.AWS_ACCOUNT_ID}}
+      AWS_REGION: ${{secrets.AWS_REGION}}
+      AWS_ECR_ACCESS_KEY_ID: ${{secrets.AWS_ECR_ACCESS_KEY_ID}}
+      AWS_ECR_SECRET_ACCESS_KEY: ${{secrets.AWS_ECR_SECRET_ACCESS_KEY}}
+      DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
+      DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
+```
+
+### Example: only push to AWS ECR
+
+```yaml
+name: Build and Push Docker image
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-push-image:
+    uses: exercism/github-actions/.github/workflows/docker-build-push-image.yml@main
+    with:
+      docker_hub: false
+    secrets:
+      AWS_ACCOUNT_ID: ${{secrets.AWS_ACCOUNT_ID}}
+      AWS_REGION: ${{secrets.AWS_REGION}}
+      AWS_ECR_ACCESS_KEY_ID: ${{secrets.AWS_ECR_ACCESS_KEY_ID}}
+      AWS_ECR_SECRET_ACCESS_KEY: ${{secrets.AWS_ECR_SECRET_ACCESS_KEY}}
+      DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
+      DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
+```
+
+### Example: only push to Docker Hub
+
+```yaml
+name: Build and Push Docker image
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-push-image:
+    uses: exercism/github-actions/.github/workflows/docker-build-push-image.yml@main
+    with:
+      aws_ecr: false
+    secrets:
+      AWS_ACCOUNT_ID: ${{secrets.AWS_ACCOUNT_ID}}
+      AWS_REGION: ${{secrets.AWS_REGION}}
+      AWS_ECR_ACCESS_KEY_ID: ${{secrets.AWS_ECR_ACCESS_KEY_ID}}
+      AWS_ECR_SECRET_ACCESS_KEY: ${{secrets.AWS_ECR_SECRET_ACCESS_KEY}}
+      DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
+      DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
+```
 
 [configlet]: https://exercism.org/docs/building/configlet
 [configlet-lint]: https://exercism.org/docs/building/configlet/lint
