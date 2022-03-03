@@ -25,8 +25,14 @@ The commands can be enabled or disabled via two boolean inputs:
 name: Configlet
 
 on:
-  push:
   pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   configlet:
@@ -34,6 +40,7 @@ jobs:
 ```
 
 Note that the worklow will take care of everything, including checking out the code.
+We've also explicitly set the permissions to just reading contents.
 
 ### Example: run linting and formatting
 
@@ -41,8 +48,14 @@ Note that the worklow will take care of everything, including checking out the c
 name: Configlet
 
 on:
-  push:
   pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   configlet:
@@ -57,8 +70,14 @@ jobs:
 name: Configlet
 
 on:
-  push:
   pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   configlet:
