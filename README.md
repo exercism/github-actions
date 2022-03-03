@@ -204,5 +204,33 @@ jobs:
       DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
 ```
 
+## Reusable workflow: labels
+
+The `labels` reusable workflow can be used to sync the repository's labels via its `.github/labels.yml` file.
+
+### Example
+
+```yaml
+name: Tools
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/labels.yml
+      - .github/workflows/sync-labels.yml
+  workflow_dispatch:
+  schedule:
+    - cron: 0 0 1 * * # First day of each month
+
+permissions:
+  issues: write
+
+jobs:
+  sync-labels:
+    uses: exercism/github-actions/.github/workflows/labels.yml@main
+```
+
 [configlet]: https://exercism.org/docs/building/configlet
 [configlet-lint]: https://exercism.org/docs/building/configlet/lint
