@@ -47,10 +47,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
 
+      - name: Check if Dockerfile is present
+        id: dockerfile-exists
+        run: |
+          dockerfile_exists=$(test -f Dockerfile && echo 'true' || echo 'false')
+          if [ "${dockerfile_exists}" == "false" ]; then
+            echo "::warning:: Skip deploy due to missing Dockerfile"
+          fi
+          echo "::set-output name=result::${dockerfile_exists}"
+
       - name: Set up Docker Buildx
+        if: steps.dockerfile-exists.outputs.result == 'true'
         uses: docker/setup-buildx-action@94ab11c41e45d028884a99163086648e898eed25
 
       - name: Cache Docker layers
+        if: steps.dockerfile-exists.outputs.result == 'true'
         uses: actions/cache@937d24475381cd9c75ae6db12cb4e79714b926ed
         with:
           path: /tmp/.buildx-cache
@@ -60,20 +71,21 @@ jobs:
 
       - name: Login to DockerHub
         uses: docker/login-action@dd4fa0671be5250ee6f50aedf4cb05514abda2c7
-        if: ${{inputs.docker_hub}}
+        if: ${{steps.dockerfile-exists.outputs.result == 'true' && inputs.docker_hub}}
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Login to ECR
         uses: docker/login-action@dd4fa0671be5250ee6f50aedf4cb05514abda2c7
-        if: ${{inputs.aws_ecr}}
+        if: ${{steps.dockerfile-exists.outputs.result == 'true' && inputs.aws_ecr}}
         with:
           registry: ${{ env.ECR_REGISTRY }}
           username: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
           password: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
 
       - name: Build Docker image
+        if: ${{steps.dockerfile-exists.outputs.result == 'true' && (inputs.docker_hub || inputs.aws_ecr)}}
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
         with:
           context: .
@@ -84,7 +96,7 @@ jobs:
 
       - name: Push to Docker Hub
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
-        if: ${{inputs.docker_hub}}
+        if: ${{steps.dockerfile-exists.outputs.result == 'true' && inputs.docker_hub}}
         with:
           context: .
           file: ./Dockerfile
@@ -97,7 +109,7 @@ jobs:
 
       - name: Push to AWS ECR
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
-        if: ${{inputs.aws_ecr}}
+        if: ${{steps.dockerfile-exists.outputs.result == 'true' && inputs.aws_ecr}}
         with:
           context: .
           file: ./Dockerfile
