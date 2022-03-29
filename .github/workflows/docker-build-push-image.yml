@@ -46,6 +46,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
+        with:
+          # Never deploy from non-main branches
+          ref: main
 
       - name: Check if Dockerfile is present
         id: dockerfile-exists
