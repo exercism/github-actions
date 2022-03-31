@@ -102,7 +102,7 @@ Which registry you want the built image to be pushed to can be enabled or disabl
 
 ### Secrets
 
-Which registry you want the built image to be pushed to can be enabled or disabled via two boolean inputs:
+These are the secrets that the workflow requires:
 
 | Name                        | Description                                           | Type     | Required |
 | --------------------------- | ----------------------------------------------------- | -------- | -------- |
@@ -203,6 +203,69 @@ jobs:
       DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
       DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
 ```
+
+## Reusable workflow: deploy-lambda
+
+The `deploy-lambda` reusable workflow can be used to easily deploy a lambda function to AWS ECR.
+
+### Inputs
+
+There are the input parameters:
+
+| Name            | Description                        | Type     | Required |
+| --------------- | ---------------------------------- | -------- | -------- |
+| `function_name` | The name of the function to deploy | `string` | True     |
+
+### Secrets
+
+These are the secrets that the workflow requires:
+
+| Name                        | Description                                           | Type     | Required |
+| --------------------------- | ----------------------------------------------------- | -------- | -------- |
+| `AWS_ACCOUNT_ID`            | The AWS account ID used to determine the ECR registry | `string` | Yes      |
+| `AWS_REGION`                | The AWS region used to determine the ECR registry     | `string` | Yes      |
+| `AWS_ECR_ACCESS_KEY_ID`     | The access key ID used to log into AWS ECR            | `string` | Yes      |
+| `AWS_ECR_SECRET_ACCESS_KEY` | The secret access key ID used to log into AWS ECR     | `string` | Yes      |
+
+### Example: default
+
+```yaml
+name: Push Docker images to DockerHub and ECR and deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-push-image:
+    uses: exercism/github-actions/.github/workflows/docker-build-push-image.yml@main
+    secrets:
+      AWS_ACCOUNT_ID: ${{secrets.AWS_ACCOUNT_ID}}
+      AWS_REGION: ${{secrets.AWS_REGION}}
+      AWS_ECR_ACCESS_KEY_ID: ${{secrets.AWS_LAMBDA_ACCESS_KEY_ID}}
+      AWS_ECR_SECRET_ACCESS_KEY: ${{secrets.AWS_LAMBDA_SECRET_ACCESS_KEY}}
+      DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
+      DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
+
+  deploy-lambda:
+    uses: exercism/github-actions/.github/workflows/deploy-lambda.yml@main
+    needs: build-and-push-image
+    with:
+      function_name: snippet_extractor
+    secrets:
+      AWS_ACCOUNT_ID: ${{secrets.AWS_ACCOUNT_ID}}
+      AWS_REGION: ${{secrets.AWS_REGION}}
+      AWS_ECR_ACCESS_KEY_ID: ${{secrets.AWS_LAMBDA_ACCESS_KEY_ID}}
+      AWS_ECR_SECRET_ACCESS_KEY: ${{secrets.AWS_LAMBDA_SECRET_ACCESS_KEY}}
+```
+
+Note that the deploy lambda workflow depends on the Docker image already having been pushed to ECR, which is done in the `build-and-push-image` job.
 
 ## Reusable workflow: labels
 
