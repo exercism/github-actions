@@ -1,0 +1,41 @@
+name: Deploy Lambda function
+
+on:
+  workflow_call:
+    inputs:
+      function_name:
+        description: "The name of the function to deploy"
+        required: true
+        type: string
+    secrets:
+      AWS_ACCOUNT_ID:
+        description: "The AWS account ID used to determine the ECR registry"
+        required: true
+      AWS_REGION:
+        description: "The AWS region used to determine the ECR registry"
+        required: true
+      AWS_ECR_ACCESS_KEY_ID:
+        description: "The access key ID used to log into AWS ECR"
+        required: true
+      AWS_ECR_SECRET_ACCESS_KEY:
+        description: "The secret access key ID used to log into AWS ECR"
+        required: true
+
+permissions: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+    steps:
+      - name: Deploy lambda
+        uses: appleboy/lambda-action@1e05c1377056f21ebb2ce69b910bc16b943c2a66
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
+          aws_region: ${{ secrets.AWS_REGION }}
+          function_name: ${{ inputs.function_name }}
+          image_uri: ${{ env.ECR_REGISTRY }}/${{ github.event.repository.name }}:production
