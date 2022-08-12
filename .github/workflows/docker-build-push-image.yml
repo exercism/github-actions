@@ -65,7 +65,7 @@ jobs:
 
       - name: Cache Docker layers
         if: steps.dockerfile-exists.outputs.result == 'true'
-        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09
+        uses: actions/cache@a7c34adf76222e77931dedbf4a45b2e4648ced19
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
