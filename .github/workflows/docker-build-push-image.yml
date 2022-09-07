@@ -73,14 +73,14 @@ jobs:
             ${{ runner.os }}-buildx-
 
       - name: Login to DockerHub
-        uses: docker/login-action@dd4fa0671be5250ee6f50aedf4cb05514abda2c7
+        uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b
         if: ${{steps.dockerfile-exists.outputs.result == 'true' && inputs.docker_hub}}
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Login to ECR
-        uses: docker/login-action@dd4fa0671be5250ee6f50aedf4cb05514abda2c7
+        uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b
         if: ${{steps.dockerfile-exists.outputs.result == 'true' && inputs.aws_ecr}}
         with:
           registry: ${{ env.ECR_REGISTRY }}
