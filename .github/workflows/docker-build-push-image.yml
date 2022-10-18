@@ -61,7 +61,7 @@ jobs:
 
       - name: Set up Docker Buildx
         if: steps.dockerfile-exists.outputs.result == 'true'
-        uses: docker/setup-buildx-action@94ab11c41e45d028884a99163086648e898eed25
+        uses: docker/setup-buildx-action@c74574e6c82eeedc46366be1b0d287eff9085eb6
 
       - name: Cache Docker layers
         if: steps.dockerfile-exists.outputs.result == 'true'
