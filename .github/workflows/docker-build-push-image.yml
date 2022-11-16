@@ -63,15 +63,6 @@ jobs:
         if: steps.dockerfile-exists.outputs.result == 'true'
         uses: docker/setup-buildx-action@94ab11c41e45d028884a99163086648e898eed25
 
-      - name: Cache Docker layers
-        if: steps.dockerfile-exists.outputs.result == 'true'
-        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
       - name: Login to DockerHub
         uses: docker/login-action@dd4fa0671be5250ee6f50aedf4cb05514abda2c7
         if: ${{steps.dockerfile-exists.outputs.result == 'true' && inputs.docker_hub}}
@@ -94,8 +85,8 @@ jobs:
           context: .
           file: ./Dockerfile
           load: true
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Push to Docker Hub
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
@@ -107,8 +98,8 @@ jobs:
           tags: |
             ${{ github.event.repository.full_name }}:latest
             ${{ github.event.repository.full_name }}:${{ github.sha }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Push to AWS ECR
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
@@ -120,5 +111,5 @@ jobs:
           tags: |
             ${{ env.ECR_REGISTRY }}/${{ github.event.repository.name }}:production
             ${{ env.ECR_REGISTRY }}/${{ github.event.repository.name }}:${{ github.sha }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
