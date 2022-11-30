@@ -22,7 +22,7 @@ jobs:
         id: is-organization-member
         with:
           script: |
-            if (context.actor == 'dependabot' || context.actor == 'exercism-bot' || context.actor == 'github-actions[bot]') {
+            if (context.actor == 'dependabot[bot]' || context.actor == 'exercism-bot' || context.actor == 'github-actions[bot]') {
               return true;
             }
 
