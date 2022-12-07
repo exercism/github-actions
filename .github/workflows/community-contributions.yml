@@ -4,9 +4,13 @@ on:
   workflow_call:
     inputs:
       forum_category:
-        description: "The forum category to use for the 'open a new topic' link"
+        description: "The forum category used in the 'open a new topic' link"
         required: true
         type: string
+    secrets:
+      github_membership_token:
+        description: "The github token used to check org membership with"
+        required: false
 
 permissions:
   issues: write
@@ -21,6 +25,7 @@ jobs:
         uses: actions/github-script@d556feaca394842dc55e4734bf3bb9f685482fa0
         id: is-organization-member
         with:
+          github-token: ${{ secrets.github_membership_token || secrets.GITHUB_TOKEN }}
           script: |
             if (context.actor == 'dependabot[bot]' || context.actor == 'exercism-bot' || context.actor == 'github-actions[bot]') {
               return true;
