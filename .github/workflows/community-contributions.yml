@@ -21,7 +21,6 @@ jobs:
         uses: actions/github-script@d556feaca394842dc55e4734bf3bb9f685482fa0
         id: is-organization-member
         with:
-          github-token: ${{ secrets.COMMUNITY_CONTRIBUTIONS_WORKFLOW }}
           script: |
             if (context.actor == 'dependabot[bot]' || context.actor == 'exercism-bot' || context.actor == 'github-actions[bot]') {
               return true;
