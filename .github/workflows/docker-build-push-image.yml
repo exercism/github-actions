@@ -32,6 +32,9 @@ on:
       DOCKERHUB_PASSWORD:
         description: "The password used to log into Docker Hub"
         required: true
+      DOCKER_BUILD_ARGS:
+        description: "Docker build arguments"
+        required: false
 
 permissions:
   contents: write
@@ -87,6 +90,7 @@ jobs:
           load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: ${{ secrets.DOCKER_BUILD_ARGS }}
 
       - name: Push to Docker Hub
         uses: docker/build-push-action@c56af957549030174b10d6867f20e78cfd7debc5
@@ -100,6 +104,7 @@ jobs:
             ${{ github.event.repository.full_name }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: ${{ secrets.DOCKER_BUILD_ARGS }}
 
       - name: Push to AWS ECR
         uses: docker/build-push-action@c56af957549030174b10d6867f20e78cfd7debc5
@@ -113,3 +118,4 @@ jobs:
             ${{ env.ECR_REGISTRY }}/${{ github.event.repository.name }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: ${{ secrets.DOCKER_BUILD_ARGS }}
