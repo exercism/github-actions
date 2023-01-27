@@ -13,6 +13,11 @@ on:
         default: true
         required: false
         type: boolean
+      provenance:
+        description: "Generate provenance attestation for the build"
+        default: true
+        required: false
+        type: boolean
     secrets:
       AWS_ACCOUNT_ID:
         description: "The AWS account ID used to determine the ECR registry"
@@ -83,7 +88,7 @@ jobs:
 
       - name: Build Docker image
         if: ${{steps.dockerfile-exists.outputs.result == 'true' && (inputs.docker_hub || inputs.aws_ecr)}}
-        uses: docker/build-push-action@c56af957549030174b10d6867f20e78cfd7debc5
+        uses: docker/build-push-action@37abcedcc1da61a57767b7588cb9d03eb57e28b3
         with:
           context: .
           file: ./Dockerfile
@@ -91,9 +96,11 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: ${{ secrets.DOCKER_BUILD_ARGS }}
+          platforms: ${{ inputs.platforms }}
+          provenance: false
 
       - name: Push to Docker Hub
-        uses: docker/build-push-action@c56af957549030174b10d6867f20e78cfd7debc5
+        uses: docker/build-push-action@37abcedcc1da61a57767b7588cb9d03eb57e28b3
         if: ${{steps.dockerfile-exists.outputs.result == 'true' && inputs.docker_hub}}
         with:
           context: .
@@ -105,9 +112,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: ${{ secrets.DOCKER_BUILD_ARGS }}
+          provenance: false
 
       - name: Push to AWS ECR
-        uses: docker/build-push-action@c56af957549030174b10d6867f20e78cfd7debc5
+        uses: docker/build-push-action@37abcedcc1da61a57767b7588cb9d03eb57e28b3
         if: ${{steps.dockerfile-exists.outputs.result == 'true' && inputs.aws_ecr}}
         with:
           context: .
@@ -119,3 +127,4 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: ${{ secrets.DOCKER_BUILD_ARGS }}
+          provenance: false
