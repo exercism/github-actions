@@ -96,7 +96,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: ${{ secrets.DOCKER_BUILD_ARGS }}
-          platforms: ${{ inputs.platforms }}
           provenance: false
 
       - name: Push to Docker Hub
