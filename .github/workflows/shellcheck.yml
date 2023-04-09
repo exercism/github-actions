@@ -15,4 +15,4 @@ jobs:
         uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
 
       - name: Run shellcheck
-        uses: ludeeus/action-shellcheck@94e0aab03ca135d11a35e5bfc14e6746dc56e7e9
+        uses: ludeeus/action-shellcheck@00cae500b08a931fb5698e11e79bfbd38e612a38
