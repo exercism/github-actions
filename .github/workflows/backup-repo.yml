@@ -1,0 +1,19 @@
+name: Backup
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  trigger_backup:
+    name: AWS
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Trigger
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/exercism/backup/dispatches -f event_type='backup_repo' -f client_payload[message]='SWEET'
