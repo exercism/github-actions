@@ -65,7 +65,7 @@ jobs:
           if [ "${dockerfile_exists}" == "false" ]; then
             echo "::warning:: Skip deploy due to missing Dockerfile"
           fi
-          echo "::set-output name=result::${dockerfile_exists}"
+          echo "result=${dockerfile_exists}" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
         if: steps.dockerfile-exists.outputs.result == 'true'
