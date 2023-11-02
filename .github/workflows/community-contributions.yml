@@ -46,11 +46,16 @@ jobs:
             const thing = (isIssue ? 'issue' : 'PR');
             const aThing = (isIssue ? 'an issue' : 'a PR');
             const forumCategory = '${{ inputs.forum_category }}'
+            const link = `https://forum.exercism.org/new-topic?title=${encodeURI(subject.title)}&body=${encodeURI(subject.body)}&category=${encodeURI(forumCategory)}`
+            const body = isIssue
+              ? `Hello. Thanks for opening an issue on Exercism 🙂\n\nAt Exercism we use our Community Forum, not GitHub issues, as the primary place for discussion. That allows maintainers and contributors from across Exercism's ecosystem to discuss your problems/ideas/suggestions without them having to subscribe to hundreds of repositories.\nThis issue will be automatically closed. Please use [this link](${link} ) to copy your GitHub Issue into a new topic on the forum, where we look forward to chatting with you!\nIf you're interested in learning more about this auto-responder, please read [this blog post](https://exercism.org/blog/contribution-guidelines-nov-2023).`
+              : `Hello. Thanks for opening a PR on Exercism 🙂\n\nWe ask that all changes to Exercism are discussed on our Community Forum before being opened on GitHub. To enforce this, we automatically close all PRs that are submitted. That doesn't mean your PR is rejected but that we want the initial discussion about it to happen on our forum where a wide range of key contributors across the Exercism ecosystem can weigh in.\nYou can use [this link](${link} ) to copy this into a new topic on the forum. If we decide the PR is appropriate, we'll reopen it and continue with it, so please don't delete your local branch.\nIf you're interested in learning more about this auto-responder, please read [this blog post](https://exercism.org/blog/contribution-guidelines-nov-2023).\n\n---\n\nNote: If this PR has been pre-approved, please link back to this PR on the forum thread and a maintainer or staff member will reopen it.`
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `Hello. Thanks for opening ${aThing} on Exercism. We are currently in a phase of our journey where we have paused community contributions to allow us to take a breather and redesign our community model. You can learn more in [this blog post](https://exercism.org/blog/freeing-our-maintainers). **As such, all issues and PRs in this repository are being automatically closed.**\n\nThat doesn't mean we're not interested in your ideas, or that if you're stuck on something we don't want to help. The best place to discuss things is with our community on the Exercism Community Forum. You can use [this link](https://forum.exercism.org/new-topic?title=${encodeURI(subject.title)}&body=${encodeURI(subject.body)}&category=${encodeURI(forumCategory)} ) to copy this into a new topic there.\n\n---\n\n_Note: If this ${thing} has been pre-approved, please link back to this ${thing} on the forum thread and a maintainer or staff member will reopen it._\n`
+              body: body
             })
       - name: Close
         if: steps.is-organization-member.outputs.result == 'false'
