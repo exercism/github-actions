@@ -1,0 +1,45 @@
+name: Keep alive
+
+on:
+  workflow_call:
+    inputs:
+      repository:
+        description: "The repository to keep alive (e.g. 'prolog')"
+        required: true
+        type: string
+    secrets:
+      pat_empty_commits:
+        description: "The github token used to author the empty commits"
+        required: false
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: The name of the repo to backup (e.g. 'prolog')
+        required: false
+
+env:
+  GIT_USERNAME: "Exercism Bot"
+  GIT_EMAIL: "66069679+exercism-bot@users.noreply.github.com"
+
+jobs:
+  keep_alive:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+        with:
+          repository: exercism/${{ inputs.repository || github.event.inputs.repository }}
+          token: ${{ secrets.pat_empty_commits }}
+          fetch-depth: 0
+          ref: main
+
+      - name: Configure the git user
+        run: |
+          git config --global user.email "${GIT_EMAIL}"
+          git config --global user.name "${GIT_USERNAME}"
+
+      - name: Create and push an empty commit
+        run: |
+          git commit --allow-empty -m "Empty commit"
+          git push origin main
