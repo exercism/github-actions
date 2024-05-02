@@ -7,6 +7,10 @@ on:
         description: "The name of the function to deploy"
         required: true
         type: string
+      image_name:
+        description: "The name of the image to deploy (default: repo name)"
+        required: false
+        type: string
     secrets:
       AWS_ACCOUNT_ID:
         description: "The AWS account ID used to determine the ECR registry"
@@ -32,10 +36,10 @@ jobs:
 
     steps:
       - name: Deploy lambda
-        uses: appleboy/lambda-action@bdbe5c99e38d855e0fa2ae1aba355da64c860a57
+        uses: appleboy/lambda-action@9c2781c7e74e336fbe8620363ceb9cdb78bac4d9
         with:
           aws_access_key_id: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
           aws_region: ${{ secrets.AWS_REGION }}
           function_name: ${{ inputs.function_name }}
-          image_uri: ${{ env.ECR_REGISTRY }}/${{ github.event.repository.name }}:production
+          image_uri: ${{ env.ECR_REGISTRY }}/${{ inputs.image_name || github.event.repository.name }}:production
