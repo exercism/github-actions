@@ -7,6 +7,10 @@ on:
         description: "The name of the function to deploy"
         required: true
         type: string
+      image_name:
+        description: "The name of the image to deploy (default: repo name)"
+        required: false
+        type: string
     secrets:
       AWS_ACCOUNT_ID:
         description: "The AWS account ID used to determine the ECR registry"
@@ -38,4 +42,4 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
           aws_region: ${{ secrets.AWS_REGION }}
           function_name: ${{ inputs.function_name }}
-          image_uri: ${{ env.ECR_REGISTRY }}/${{ github.event.repository.name }}:production
+          image_uri: ${{ env.ECR_REGISTRY }}/${{ inputs.image_name || github.event.repository.name }}:production
