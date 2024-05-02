@@ -106,8 +106,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ github.event.repository.full_name }}:latest
-            ${{ github.event.repository.full_name }}:${{ github.sha }}
+            exercism/${{ github.event.repository.name }}:latest
+            exercism/${{ github.event.repository.name }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: ${{ secrets.DOCKER_BUILD_ARGS }}
