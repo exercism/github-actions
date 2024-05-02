@@ -18,6 +18,10 @@ on:
         default: true
         required: false
         type: boolean
+      image_name:
+        description: "The name of the image to deploy (default: repo name)"
+        required: false
+        type: string
     secrets:
       AWS_ACCOUNT_ID:
         description: "The AWS account ID used to determine the ECR registry"
@@ -106,8 +110,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            exercism/${{ github.event.repository.name }}:latest
-            exercism/${{ github.event.repository.name }}:${{ github.sha }}
+            exercism/${{ inputs.image_name || github.event.repository.name }}:latest
+            exercism/${{ inputs.image_name || github.event.repository.name }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: ${{ secrets.DOCKER_BUILD_ARGS }}
@@ -121,8 +125,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ env.ECR_REGISTRY }}/${{ github.event.repository.name }}:production
-            ${{ env.ECR_REGISTRY }}/${{ github.event.repository.name }}:${{ github.sha }}
+            ${{ env.ECR_REGISTRY }}/${{ inputs.image_name || github.event.repository.name }}:production
+            ${{ env.ECR_REGISTRY }}/${{ inputs.image_name || github.event.repository.name }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: ${{ secrets.DOCKER_BUILD_ARGS }}
