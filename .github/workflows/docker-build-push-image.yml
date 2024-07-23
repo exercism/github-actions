@@ -92,7 +92,7 @@ jobs:
 
       - name: Build Docker image
         if: ${{steps.dockerfile-exists.outputs.result == 'true' && (inputs.docker_hub || inputs.aws_ecr)}}
-        uses: docker/build-push-action@1ca370b3a9802c92e886402e0dd88098a2533b12
+        uses: docker/build-push-action@5176d81f87c23d6fc96624dfdbcd9f3830bbe445
         with:
           context: .
           file: ./Dockerfile
@@ -103,7 +103,7 @@ jobs:
           provenance: false
 
       - name: Push to Docker Hub
-        uses: docker/build-push-action@1ca370b3a9802c92e886402e0dd88098a2533b12
+        uses: docker/build-push-action@5176d81f87c23d6fc96624dfdbcd9f3830bbe445
         if: ${{steps.dockerfile-exists.outputs.result == 'true' && inputs.docker_hub}}
         with:
           context: .
@@ -118,7 +118,7 @@ jobs:
           provenance: false
 
       - name: Push to AWS ECR
-        uses: docker/build-push-action@1ca370b3a9802c92e886402e0dd88098a2533b12
+        uses: docker/build-push-action@5176d81f87c23d6fc96624dfdbcd9f3830bbe445
         if: ${{steps.dockerfile-exists.outputs.result == 'true' && inputs.aws_ecr}}
         with:
           context: .
