@@ -34,7 +34,7 @@ jobs:
         with:
           github-token: ${{ secrets.github_membership_token || secrets.GITHUB_TOKEN }}
           script: |
-            // TODO: decide if we want to comment on bot PRs
+            // Uncomment this if we don't want to ping when the PR is created by a bot
             // if (context.actor == 'dependabot[bot]' || context.actor == 'exercism-bot' || context.actor == 'github-actions[bot]') {
             //  return true;
             //}
@@ -55,5 +55,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `This repo is currently unmaintained, which means that it can take longer for your PR to be reviewed.\n\nCC @exercism/cross-track-maintainers.`
+              body: `Hello 👋 Thanks for your PR.\n\nThis repo does not currently have dedicated maintainers. Our cross-track maintainers team will attempt to review and merge your PR, but it will likely take longer for your PR to be reviewed.\n\nIf you enjoy contributing to Exercism and have a track-record of doing so successfully, you might like to become an Exercism maintainer for this track.\n\nPlease feel free to ask any questions, or chat to us about anything to do with this PR or the reviewing process on the [Exercism forum](https://exercism.org/r/forum).\n\n_(cc @exercism/cross-track-maintainers)_`
             })
