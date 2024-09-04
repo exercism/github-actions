@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Check if repo is unmaintained
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
-        id: is-unmaintained
+        id: ping-cross-track-maintainers
         with:
           script: |
             const response = await github.rest.repos.getAllTopics({
@@ -25,12 +25,13 @@ jobs:
               repo: context.repo.repo,
             });
 
-            return response.data.names.includes('unmaintained');
+            return response.data.names.includes('unmaintained') ||
+                   response.data.names.includes('maintained-solitary');
 
       - name: Check if user is cross-track maintainer
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
-        id: is-cross-track-maintainer
-        if: steps.is-unmaintained.outputs.result == 'true'
+        id: author-is-cross-track-maintainer
+        if: steps.ping-cross-track-maintainers.outputs.result == 'true'
         with:
           github-token: ${{ secrets.github_membership_token || secrets.GITHUB_TOKEN }}
           script: |
@@ -47,7 +48,7 @@ jobs:
               .catch(err => false);
 
       - name: Create comment
-        if: steps.is-unmaintained.outputs.result == 'true' && steps.is-cross-track-maintainer.outputs.result == 'false'
+        if: steps.ping-cross-track-maintainers.outputs.result == 'true' && steps.author-is-cross-track-maintainer.outputs.result == 'false'
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
         with:
           script: |
