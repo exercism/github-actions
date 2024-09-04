@@ -1,0 +1,59 @@
+name: Ping cross-track maintainers team
+
+on:
+  workflow_call:
+    secrets:
+      github_membership_token:
+        description: "The github token used to check team membership with"
+        required: false
+
+permissions:
+  pull-requests: write
+
+jobs:
+  ping:
+    name: Ping team
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check if repo is unmaintained
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        id: is-unmaintained
+        with:
+          script: |
+            const response = await github.rest.repos.getAllTopics({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            return response.data.names.includes('unmaintained');
+
+      - name: Check if user is cross-track maintainer
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        id: is-cross-track-maintainer
+        if: steps.is-unmaintained.outputs.result == 'true'
+        with:
+          github-token: ${{ secrets.github_membership_token || secrets.GITHUB_TOKEN }}
+          script: |
+            // Uncomment this if we don't want to ping when the PR is created by a bot
+            // if (context.actor == 'dependabot[bot]' || context.actor == 'exercism-bot' || context.actor == 'github-actions[bot]') {
+            //  return true;
+            //}
+
+            return github.rest.teams.getMembershipForUserInOrg({
+              org: context.repo.owner,
+              team_slug: 'cross-track-maintainers',
+              username: context.actor,
+            }).then(response => true)
+              .catch(err => false);
+
+      - name: Create comment
+        if: steps.is-unmaintained.outputs.result == 'true' && steps.is-cross-track-maintainer.outputs.result == 'false'
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Hello 👋 Thanks for your PR.\n\nThis repo does not currently have dedicated maintainers. Our cross-track maintainers team will attempt to review and merge your PR, but it will likely take longer for your PR to be reviewed.\n\nIf you enjoy contributing to Exercism and have a track-record of doing so successfully, you might like to become an Exercism maintainer for this track.\n\nPlease feel free to ask any questions, or chat to us about anything to do with this PR or the reviewing process on the [Exercism forum](https://exercism.org/r/forum).\n\n_(cc @exercism/cross-track-maintainers)_`
+            })
