@@ -1,4 +1,4 @@
-name: Ping cross-track maintainers team
+name: Ping maintainers team
 
 on:
   workflow_call:
@@ -15,9 +15,9 @@ jobs:
     name: Ping team
     runs-on: ubuntu-22.04
     steps:
-      - name: Check if repo is unmaintained
+      - name: Check if repo requires ping
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
-        id: ping-cross-track-maintainers
+        id: repo-requires-ping
         with:
           script: |
             const response = await github.rest.repos.getAllTopics({
@@ -28,10 +28,23 @@ jobs:
             return response.data.names.includes('unmaintained') ||
                    response.data.names.includes('maintained-solitary');
 
-      - name: Check if user is cross-track maintainer
+      - name: Check if repo is tooling repo
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
-        id: author-is-cross-track-maintainer
-        if: steps.ping-cross-track-maintainers.outputs.result == 'true'
+        if: steps.repo-requires-ping.outputs.result == 'true'
+        id: is-tooling-repo
+        with:
+          script: |
+            const response = await github.rest.repos.getAllTopics({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            return response.data.names.includes('exercism-tooling');
+
+      - name: Check if PR author is member of cross-track-maintainers team
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        if: steps.repo-requires-ping.outputs.result == 'true' && steps.is-tooling-repo.outputs.result == 'false'
+        id: author-is-member-cross-track-maintainers-team
         with:
           github-token: ${{ secrets.github_membership_token || secrets.GITHUB_TOKEN }}
           script: |
@@ -47,8 +60,27 @@ jobs:
             }).then(response => true)
               .catch(err => false);
 
-      - name: Create comment
-        if: steps.ping-cross-track-maintainers.outputs.result == 'true' && steps.author-is-cross-track-maintainer.outputs.result == 'false'
+      - name: Check if PR author is member of guardians team
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        id: author-is-member-guardians-team
+        if: steps.repo-requires-ping.outputs.result == 'true' && steps.is-tooling-repo.outputs.result == 'true'
+        with:
+          github-token: ${{ secrets.github_membership_token || secrets.GITHUB_TOKEN }}
+          script: |
+            // Uncomment this if we don't want to ping when the PR is created by a bot
+            // if (context.actor == 'dependabot[bot]' || context.actor == 'exercism-bot' || context.actor == 'github-actions[bot]') {
+            //  return true;
+            //}
+
+            return github.rest.teams.getMembershipForUserInOrg({
+              org: context.repo.owner,
+              team_slug: 'guardians',
+              username: context.actor,
+            }).then(response => true)
+              .catch(err => false);
+
+      - name: Create cross-track-maintainers team ping comment
+        if: steps.repo-requires-ping.outputs.result == 'true' && steps.is-tooling-repo.outputs.result == 'false' && steps.author-is-member-cross-track-maintainers-team.outputs.result == 'false'
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
         with:
           script: |
@@ -57,4 +89,16 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: `Hello 👋 Thanks for your PR.\n\nThis repo does not currently have dedicated maintainers. Our cross-track maintainers team will attempt to review and merge your PR, but it will likely take longer for your PR to be reviewed.\n\nIf you enjoy contributing to Exercism and have a track-record of doing so successfully, you might like to become an Exercism maintainer for this track.\n\nPlease feel free to ask any questions, or chat to us about anything to do with this PR or the reviewing process on the [Exercism forum](https://exercism.org/r/forum).\n\n_(cc @exercism/cross-track-maintainers)_`
+            })
+
+      - name: Create guardians team ping comment
+        if: steps.repo-requires-ping.outputs.result == 'true' && steps.is-tooling-repo.outputs.result == 'true' && steps.author-is-member-guardians-team.outputs.result == 'false'
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Hello 👋 Thanks for your PR.\n\nThis repo does not currently have dedicated maintainers. Our guardians team will attempt to review and merge your PR, but it will likely take longer for your PR to be reviewed.\n\nIf you enjoy contributing to Exercism and have a track-record of doing so successfully, you might like to become an Exercism maintainer for this track.\n\nPlease feel free to ask any questions, or chat to us about anything to do with this PR or the reviewing process on the [Exercism forum](https://exercism.org/r/forum).\n\n_(cc @exercism/guardians)_`
             })
