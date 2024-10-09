@@ -31,12 +31,12 @@ jobs:
         run: |
           set -exo pipefail
 
-          git remote set-branches origin main
-          git fetch --depth 1 origin main
+          git remote add upstream "https://github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --depth 1 upstream main
 
-          git diff --diff-filter=M --name-only origin/main
+          git diff --diff-filter=M --name-only upstream/main
 
-          for changed_file in $(git diff --diff-filter=M --name-only origin/main); do
+          for changed_file in $(git diff --diff-filter=M --name-only upstream/main); do
             slug="$(echo "${changed_file}" | sed --regexp-extended 's#exercises/[^/]+/([^/]+)/.*#\1#' )"
             path_before_slug="$(echo "${changed_file}" | sed --regexp-extended "s#(.*)/${slug}/.*#\\1#" )"
             path_after_slug="$( echo "${changed_file}" | sed --regexp-extended "s#.*/${slug}/(.*)#\\1#" )"
