@@ -41,6 +41,19 @@ jobs:
 
             return response.data.names.includes('exercism-tooling');
 
+      - name: Check if repo is unmaintained repo
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        if: steps.repo-requires-ping.outputs.result == 'true'
+        id: is-unmaintained-repo
+        with:
+          script: |
+            const response = await github.rest.repos.getAllTopics({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            return response.data.names.includes('unmaintained');
+
       - name: Check if PR author is member of cross-track-maintainers team
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
         if: steps.repo-requires-ping.outputs.result == 'true' && steps.is-tooling-repo.outputs.result == 'false'
@@ -89,6 +102,18 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: `Hello 👋 Thanks for your PR.\n\nThis repo does not currently have dedicated maintainers. Our cross-track maintainers team will attempt to review and merge your PR, but it will likely take longer for your PR to be reviewed.\n\nIf you enjoy contributing to Exercism and have a track-record of doing so successfully, you might like to become an Exercism maintainer for this track.\n\nPlease feel free to ask any questions, or chat to us about anything to do with this PR or the reviewing process on the [Exercism forum](https://exercism.org/r/forum).\n\n_(cc @exercism/cross-track-maintainers)_`
+            })
+
+      - name: Create cross-track-maintainers team unmaintained repo comment
+        if: steps.repo-requires-ping.outputs.result == 'true' && steps.is-tooling-repo.outputs.result == 'false' && steps.is-unmaintained-repo.outputs.result == 'true' && steps.author-is-member-cross-track-maintainers-team.outputs.result == 'false'
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `This is an unmaintained repository.\n\nCross-track maintainers - feel free to merge.`
             })
 
       - name: Create guardians team ping comment
