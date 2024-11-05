@@ -20,39 +20,67 @@ jobs:
     name: No important files changed
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout code
-        uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938
-        with:
-          repository: ${{ inputs.repository }}
-          ref: ${{ inputs.ref }}
-
       - name: Check if important files changed
         id: check
-        run: |
-          set -exo pipefail
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pull_number = context.issue.number
 
-          git remote add upstream "https://github.com/${GITHUB_REPOSITORY}.git"
-          git fetch --depth 1 upstream main
+            return github.rest.pulls.listFiles({ owner, repo, pull_number })
+              .then(async ({ data: files }) => {
+                const filenames = files.map(file => file.filename);
+                console.log(`Files in PR: ${filenames}`);
 
-          git diff --diff-filter=M --name-only upstream/main
+                // Cache the parsed exercise config file's invalidator files
+                let exerciseInvalidatorFiles = {};
 
-          for changed_file in $(git diff --diff-filter=M --name-only upstream/main); do
-            slug="$(echo "${changed_file}" | sed --regexp-extended 's#exercises/[^/]+/([^/]+)/.*#\1#' )"
-            path_before_slug="$(echo "${changed_file}" | sed --regexp-extended "s#(.*)/${slug}/.*#\\1#" )"
-            path_after_slug="$( echo "${changed_file}" | sed --regexp-extended "s#.*/${slug}/(.*)#\\1#" )"
-            config_json_file="${path_before_slug}/${slug}/.meta/config.json"
+                return filenames.some(async (filename) => {
+                  const match = /^exercises\/(?<type>practice|concept)\/(?<slug>[^\/]+)\/(?<path>.+)$/i.exec(filename);
+                  if (match?.groups === undefined) {
+                    console.log(`${filename}: skipped (can't invalidate test results)`);
+                    return false;
+                  }
 
-            if ! [ -f "${config_json_file}" ]; then
-              # cannot determine if important files changed without .meta/config.json
-              continue
-            fi
+                  const { type, slug, path } = match.groups;
+                  const configFile = `exercises/${type}/${slug}/.meta/config.json`;
 
-            changed=$(jq --arg path "${path_after_slug}" '[.files.test, .files.invalidator, .files.editor] | flatten | index($path) != null' "${config_json_file}")
-            echo "important_files_changed=${changed}" >> "$GITHUB_OUTPUT"
-          done
+                  const parseInvalidatorFiles = (path) => {
+                    return github.rest.repos
+                      .getContent({ owner, repo, path })
+                      .then(({ data: { content } }) => JSON.parse(Buffer.from(content, "base64").toString()))
+                      .then((config) => {
+                        const files = config.files;
+                        if (files === undefined) {
+                          return [];
+                        }
+
+                        return [].concat(
+                          files["invalidator"] || [],
+                          files["test"] || [],
+                          files["editor"] || []
+                        );
+                      })
+                      .catch((err) => []);
+                  };
+
+                  exerciseInvalidatorFiles[slug] ||= await parseInvalidatorFiles(configFile);
+                  const invalidatesTests = exerciseInvalidatorFiles[slug].includes(path)
+
+                  if (invalidatesTests) {
+                    console.log(`${filename}: invalidates test results`);
+                  } else {
+                    console.log(`${filename}: does not invalidate test results`);
+                  }
+
+                  return invalidatesTests;
+                });
+              })
+              .catch((err) => false);
 
       - name: Suggest to add [no important files changed]
-        if: steps.check.outputs.important_files_changed == 'true'
+        if: steps.check.outputs.result == 'true'
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
         with:
           script: |
