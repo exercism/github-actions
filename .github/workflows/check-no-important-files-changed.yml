@@ -28,16 +28,22 @@ jobs:
             const { owner, repo } = context.repo;
             const pull_number = context.issue.number
 
-            return github.rest.pulls.listFiles({ owner, repo, pull_number })
+            return github.rest.pulls
+              .listFiles({ owner, repo, pull_number })
               .then(async ({ data: files }) => {
-                const filenames = files.filter(file => file.status !== "added").map(file => file.filename);
+                const filenames = files
+                  .filter((file) => file.status !== "added")
+                  .map((file) => file.filename);
                 console.log(`Files in PR: ${filenames}`);
 
                 // Cache the parsed exercise config file's invalidator files
                 let exerciseInvalidatorFiles = {};
 
-                return filenames.some(async (filename) => {
-                  const match = /^exercises\/(?<type>practice|concept)\/(?<slug>[^\/]+)\/(?<path>.+)$/i.exec(filename);
+                for (const filename of filenames) {
+                  const match =
+                    /^exercises\/(?<type>practice|concept)\/(?<slug>[^\/]+)\/(?<path>.+)$/i.exec(
+                      filename
+                    );
                   if (match?.groups === undefined) {
                     console.log(`${filename}: skipped (can't invalidate test results)`);
                     return false;
@@ -49,7 +55,9 @@ jobs:
                   const parseInvalidatorFiles = (path) => {
                     return github.rest.repos
                       .getContent({ owner, repo, path })
-                      .then(({ data: { content } }) => JSON.parse(Buffer.from(content, "base64").toString()))
+                      .then(({ data: { content } }) =>
+                        JSON.parse(Buffer.from(content, "base64").toString())
+                      )
                       .then((config) => {
                         const files = config.files;
                         if (files === undefined) {
@@ -65,8 +73,10 @@ jobs:
                       .catch((err) => []);
                   };
 
-                  exerciseInvalidatorFiles[slug] ||= await parseInvalidatorFiles(configFile);
-                  const invalidatesTests = exerciseInvalidatorFiles[slug].includes(path)
+                  exerciseInvalidatorFiles[slug] ||= await parseInvalidatorFiles(
+                    configFile
+                  );
+                  const invalidatesTests = exerciseInvalidatorFiles[slug].includes(path);
 
                   if (invalidatesTests) {
                     console.log(`${filename}: invalidates test results`);
@@ -75,7 +85,9 @@ jobs:
                   }
 
                   return invalidatesTests;
-                });
+                }
+
+                return false;
               })
               .catch((err) => false);
 
