@@ -30,7 +30,7 @@ jobs:
 
             return github.rest.pulls.listFiles({ owner, repo, pull_number })
               .then(async ({ data: files }) => {
-                const filenames = files.map(file => file.filename);
+                const filenames = files.filter(file => file.status !== "added").map(file => file.filename);
                 console.log(`Files in PR: ${filenames}`);
 
                 // Cache the parsed exercise config file's invalidator files
