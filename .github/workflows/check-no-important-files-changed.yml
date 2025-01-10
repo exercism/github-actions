@@ -46,7 +46,7 @@ jobs:
                     );
                   if (match?.groups === undefined) {
                     console.log(`${filename}: skipped (can't invalidate test results)`);
-                    return false;
+                    continue;
                   }
 
                   const { type, slug, path } = match.groups;
@@ -80,11 +80,10 @@ jobs:
 
                   if (invalidatesTests) {
                     console.log(`${filename}: invalidates test results`);
+                    return true;
                   } else {
                     console.log(`${filename}: does not invalidate test results`);
                   }
-
-                  return invalidatesTests;
                 }
 
                 return false;
