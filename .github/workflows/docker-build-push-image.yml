@@ -13,6 +13,10 @@ on:
         default: true
         required: false
         type: boolean
+      docker_build_script:
+        description: "Script that produces a Docker image"
+        required: false
+        type: string
       provenance:
         description: "Generate provenance attestation for the build"
         default: true
@@ -95,8 +99,12 @@ jobs:
           username: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
           password: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
 
+      - name: Build Docker image via build script
+        if: ${{ inputs.docker_build_script && steps.dockerfile-exists.outputs.result == 'true' && (inputs.docker_hub || inputs.aws_ecr)}}
+        run: ${{ inputs.docker_build_script }}
+
       - name: Build Docker image
-        if: ${{steps.dockerfile-exists.outputs.result == 'true' && (inputs.docker_hub || inputs.aws_ecr)}}
+        if: ${{ !inputs.docker_build_script && steps.dockerfile-exists.outputs.result == 'true' && (inputs.docker_hub || inputs.aws_ecr)}}
         uses: docker/build-push-action@471d1dc4e07e5cdedd4c2171150001c434f0b7a4
         with:
           context: .
