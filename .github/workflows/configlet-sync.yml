@@ -52,18 +52,11 @@ jobs:
       - name: Run configlet sync for test and capture output
         id: sync_test
         run: |
-          configlet_raw_output="$(./bin/configlet sync --tests | tee .github/sync-test-output.txt)"
+          configlet_raw_output="$(./bin/configlet sync --tests)"
 
-          echo "configlet output:"
-          echo "$configlet_raw_output"
-
-          echo '```' > .github/sync-test-output.txt
-          echo "$configlet_raw_output" >> .github/sync-test-output.txt
-          echo '```' >> .github/sync-test-output.txt
-
-          echo "output<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$configlet_raw_output" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+          printf "configlet output:\n%s\n" "$configlet_raw_output"
+          printf '```\n%s\n```\n' "$configlet_raw_output" > .github/sync-test-output.txt
+          printf 'output<<EOF\n%s\nEOF\n' "$configlet_raw_output" > "$GITHUB_OUTPUT"
 
       - name: Find existing issue for test sync
         id: find_issue
