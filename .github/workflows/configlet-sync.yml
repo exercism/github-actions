@@ -52,19 +52,20 @@ jobs:
       - name: Run configlet sync for test and capture output
         id: sync_test
         run: |
-          configlet_raw_output="$(./bin/configlet sync --tests)"
+          configlet_raw_output="$(./bin/configlet sync --tests 2>&1 || true)"
 
           printf "configlet output:\n%s\n" "$configlet_raw_output"
-          mkdir -p temp
-          printf '```\n%s\n```\n' "$configlet_raw_output" > temp/sync-test-output.txt
           printf 'output<<EOF\n%s\nEOF\n' "$configlet_raw_output" > "$GITHUB_OUTPUT"
 
-      - name: Find existing issue for test sync
+      - name: Format test sync output and find existing issue
         id: find_issue
         if: ${{ !contains(steps.sync_test.outputs.output, 'Every exercise has up-to-date tests!') }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          mkdir -p temp
+          printf '```\n%s\n```\n' "${{ steps.sync_test.outputs.output }}" > temp/sync-test-output.txt
+
           ISSUE_TITLE="🚨 configlet sync --test found unsynced tests"
           ISSUE_DATA=$(gh issue list --search "is:issue is:open in:title \"${ISSUE_TITLE}\" repo:${{ github.repository }}" --json number,title --jq '.[0]')
 
