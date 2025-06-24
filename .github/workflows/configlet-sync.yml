@@ -63,8 +63,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p temp
-          printf '```\n%s\n```\n' "${{ steps.sync_test.outputs.output }}" > temp/sync-test-output.txt
+          printf '```\n%s\n```\n' "${{ steps.sync_test.outputs.output }}" > /tmp/sync-test-output.txt
 
           ISSUE_TITLE="🚨 configlet sync --test found unsynced tests"
           ISSUE_DATA=$(gh issue list --search "is:issue is:open in:title \"${ISSUE_TITLE}\" repo:${{ github.repository }}" --json number,title --jq '.[0]')
@@ -84,5 +83,5 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: "🚨 configlet sync --test found unsynced tests"
-          content-filepath: temp/sync-test-output.txt
+          content-filepath: /tmp/sync-test-output.txt
           issue-number: ${{ steps.find_issue.outputs.issue_number || '' }}
