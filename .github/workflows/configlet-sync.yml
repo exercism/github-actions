@@ -75,7 +75,7 @@ jobs:
           ISSUE_DATA=$(gh issue list --search "is:issue is:open in:title \"${ISSUE_TITLE}\" repo:${{ github.repository }}" --json number,title --jq '.[0]')
 
           if [ -z "$ISSUE_DATA" ]; then
-            echo "No open issue found with title: '${ISSUE_TITLE}'. A new one will be created."
+            printf "No open issue found with title: '%s'. A new one will be created.\n" "${ISSUE_TITLE}"
             echo "issue_number=" >> $GITHUB_OUTPUT
           else
             ISSUE_NUMBER=$(echo "$ISSUE_DATA" | jq -r '.number')
