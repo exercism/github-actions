@@ -55,7 +55,8 @@ jobs:
           configlet_raw_output="$(./bin/configlet sync --tests)"
 
           printf "configlet output:\n%s\n" "$configlet_raw_output"
-          printf '```\n%s\n```\n' "$configlet_raw_output" > .github/sync-test-output.txt
+          mkdir -p temp
+          printf '```\n%s\n```\n' "$configlet_raw_output" > temp/sync-test-output.txt
           printf 'output<<EOF\n%s\nEOF\n' "$configlet_raw_output" > "$GITHUB_OUTPUT"
 
       - name: Find existing issue for test sync
@@ -82,5 +83,5 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: "🚨 configlet sync --test found unsynced tests"
-          content-filepath: .github/sync-test-output.txt
+          content-filepath: temp/sync-test-output.txt
           issue-number: ${{ steps.find_issue.outputs.issue_number || '' }}
