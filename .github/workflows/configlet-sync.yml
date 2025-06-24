@@ -78,7 +78,7 @@ jobs:
             printf "No open issue found with title: '%s'. A new one will be created.\n" "${ISSUE_TITLE}"
             echo "issue_number=" >> $GITHUB_OUTPUT
           else
-            ISSUE_NUMBER=$(echo "$ISSUE_DATA" | jq -r '.number')
+            ISSUE_NUMBER=$(jq -r '.number' <<< "$ISSUE_DATA")
             echo "Found existing issue number: $ISSUE_NUMBER for title: '$ISSUE_TITLE'"
             echo "issue_number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
           fi
