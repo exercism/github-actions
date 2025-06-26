@@ -1,9 +1,7 @@
 name: Configlet Auto Sync
 
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: '0 0 15 * *'
+  workflow_call:
 
 jobs:
   sync-docs-metadata:
