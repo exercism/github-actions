@@ -49,15 +49,12 @@ jobs:
 
       - name: Run configlet sync for test and capture output
         id: sync_test
+        shell: bash {0}
         run: |
-          set +e
           configlet_raw_output="$(./bin/configlet sync --tests 2>&1)"
           exit_code=$?
-          set -e
-
           echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
           printf "output<<EOF\n%s\nEOF\n" "$configlet_raw_output" >> "$GITHUB_OUTPUT"
-
           printf "configlet output:\n%s\n" "$configlet_raw_output"
 
       - name: Format test sync output and find existing issue
