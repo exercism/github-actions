@@ -52,14 +52,19 @@ jobs:
       - name: Run configlet sync for test and capture output
         id: sync_test
         run: |
-          configlet_raw_output="$(./bin/configlet sync --tests 2>&1 || true)"
+          set +e
+          configlet_raw_output="$(./bin/configlet sync --tests 2>&1)"
+          exit_code=$?
+          set -e
+
+          echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
+          printf "output<<EOF\n%s\nEOF\n" "$configlet_raw_output" >> "$GITHUB_OUTPUT"
 
           printf "configlet output:\n%s\n" "$configlet_raw_output"
-          printf 'output<<EOF\n%s\nEOF\n' "$configlet_raw_output" > "$GITHUB_OUTPUT"
 
       - name: Format test sync output and find existing issue
         id: find_issue
-        if: ${{ !contains(steps.sync_test.outputs.output, 'Every exercise has up-to-date tests!') }}
+        if: ${{ steps.sync_test.outputs.exit_code != 0 }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -78,7 +83,7 @@ jobs:
           fi
 
       - name: Create or Update issue if tests are not synced
-        if: ${{ !contains(steps.sync_test.outputs.output, 'Every exercise has up-to-date tests!') }}
+        if: ${{ steps.sync_test.outputs.exit_code != 0 }}
         uses: peter-evans/create-issue-from-file@e8ef132d6df98ed982188e460ebb3b5d4ef3a9cd
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
