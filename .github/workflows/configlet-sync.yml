@@ -74,7 +74,7 @@ jobs:
           else
             ISSUE_NUMBER=$(jq -r '.number' <<< "$ISSUE_DATA")
             echo "Found existing issue number: $ISSUE_NUMBER for title: '$ISSUE_TITLE'"
-            echo "issue_number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
+            echo "issue_number=$ISSUE_NUMBER" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create or Update issue if tests are not synced
