@@ -53,7 +53,7 @@ jobs:
         run: |
           configlet_raw_output="$(./bin/configlet sync --tests)"
           exit_code=$?
-          echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
+          printf "exit_code=%d\n" "$exit_code" >> "$GITHUB_OUTPUT"
           printf "output<<EOF\n%s\nEOF\n" "$configlet_raw_output" >> "$GITHUB_OUTPUT"
           printf "configlet output:\n%s\n" "$configlet_raw_output"
 
@@ -70,11 +70,11 @@ jobs:
 
           if [[ -z "$ISSUE_DATA" ]]; then
             printf "No open issue found with title: '%s'. A new one will be created.\n" "${ISSUE_TITLE}"
-            echo "issue_number=" >> "$GITHUB_OUTPUT"
+            printf "issue_number=\n" >> "$GITHUB_OUTPUT"
           else
             ISSUE_NUMBER=$(jq -r '.number' <<< "$ISSUE_DATA")
-            echo "Found existing issue number: $ISSUE_NUMBER for title: '$ISSUE_TITLE'"
-            echo "issue_number=$ISSUE_NUMBER" >> "$GITHUB_OUTPUT"
+            printf "Found existing issue number: %s for title: %s\n" "$ISSUE_NUMBER" "$ISSUE_TITLE"
+            printf "issue_number=%s\n" "$ISSUE_NUMBER" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create or Update issue if tests are not synced
