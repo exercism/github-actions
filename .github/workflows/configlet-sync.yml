@@ -51,7 +51,7 @@ jobs:
         id: sync_test
         shell: bash {0}
         run: |
-          configlet_raw_output="$(./bin/configlet sync --tests 2>&1)"
+          configlet_raw_output="$(./bin/configlet sync --tests)"
           exit_code=$?
           echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
           printf "output<<EOF\n%s\nEOF\n" "$configlet_raw_output" >> "$GITHUB_OUTPUT"
