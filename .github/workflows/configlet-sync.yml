@@ -2,10 +2,20 @@ name: Configlet Auto Sync
 
 on:
   workflow_call:
+    inputs:
+      run_docs:
+        required: false
+        type: boolean
+        default: true
+      run_tests:
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   sync-docs-metadata:
     timeout-minutes: 10
+    if: ${{ inputs.run_docs }}
     runs-on: ubuntu-24.04
 
     steps:
@@ -38,6 +48,7 @@ jobs:
 
   check-test-sync:
     timeout-minutes: 10
+    if: ${{ inputs.run_tests }}
     runs-on: ubuntu-24.04
 
     steps:
