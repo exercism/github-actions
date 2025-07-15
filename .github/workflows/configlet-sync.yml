@@ -15,7 +15,7 @@ on:
 jobs:
   sync-docs-metadata:
     timeout-minutes: 10
-    if: ${{ inputs.sync_docs }}
+    if: github.repository_owner == 'exercism' && inputs.sync_docs
     runs-on: ubuntu-24.04
 
     steps:
@@ -48,7 +48,7 @@ jobs:
 
   check-test-sync:
     timeout-minutes: 10
-    if: ${{ inputs.sync_tests }}
+    if: github.repository_owner == 'exercism' && inputs.sync_tests
     runs-on: ubuntu-24.04
 
     steps:
