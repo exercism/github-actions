@@ -28,11 +28,18 @@ jobs:
       - name: Run configlet sync for files
         run: ./bin/configlet sync --docs --metadata --filepaths -u -y
 
+      - name: Set git author to GitHub Actions bot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Create pull request if changes
         uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "🤖 Auto-sync docs, metadata, and filepaths"
+          committer: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+          author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
           title: "🤖 Configlet sync: docs, metadata, and filepaths"
           body: |
             This PR was generated automatically by a scheduled workflow.
