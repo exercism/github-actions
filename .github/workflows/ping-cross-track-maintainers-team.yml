@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Check if repo requires ping
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         id: repo-requires-ping
         with:
           script: |
@@ -29,7 +29,7 @@ jobs:
                    response.data.names.includes('maintained-solitary');
 
       - name: Check if repo is tooling repo
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         if: steps.repo-requires-ping.outputs.result == 'true'
         id: is-tooling-repo
         with:
@@ -42,7 +42,7 @@ jobs:
             return response.data.names.includes('exercism-tooling');
 
       - name: Check if repo is unmaintained repo
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         if: steps.repo-requires-ping.outputs.result == 'true'
         id: is-unmaintained-repo
         with:
@@ -55,7 +55,7 @@ jobs:
             return response.data.names.includes('unmaintained');
 
       - name: Check if PR author is member of cross-track-maintainers team
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         if: steps.repo-requires-ping.outputs.result == 'true' && steps.is-tooling-repo.outputs.result == 'false'
         id: author-is-member-cross-track-maintainers-team
         with:
@@ -74,7 +74,7 @@ jobs:
               .catch(err => false);
 
       - name: Check if PR author is member of guardians team
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         id: author-is-member-guardians-team
         if: steps.repo-requires-ping.outputs.result == 'true' && steps.is-tooling-repo.outputs.result == 'true'
         with:
@@ -94,7 +94,7 @@ jobs:
 
       - name: Create cross-track-maintainers team ping comment
         if: steps.repo-requires-ping.outputs.result == 'true' && steps.is-tooling-repo.outputs.result == 'false' && steps.author-is-member-cross-track-maintainers-team.outputs.result == 'false'
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
             github.rest.issues.createComment({
@@ -106,7 +106,7 @@ jobs:
 
       - name: Create cross-track-maintainers team unmaintained repo comment
         if: steps.repo-requires-ping.outputs.result == 'true' && steps.is-tooling-repo.outputs.result == 'false' && steps.is-unmaintained-repo.outputs.result == 'true' && steps.author-is-member-cross-track-maintainers-team.outputs.result == 'false'
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
             github.rest.issues.createComment({
@@ -118,7 +118,7 @@ jobs:
 
       - name: Create guardians team ping comment
         if: steps.repo-requires-ping.outputs.result == 'true' && steps.is-tooling-repo.outputs.result == 'true' && steps.author-is-member-guardians-team.outputs.result == 'false'
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
             github.rest.issues.createComment({
