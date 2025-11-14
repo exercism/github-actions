@@ -75,6 +75,9 @@ jobs:
             echo "::warning:: Skip deploy due to missing Dockerfile"
           fi
           echo "result=${dockerfile_exists}" >> $GITHUB_OUTPUT
+      
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         if: steps.dockerfile-exists.outputs.result == 'true'
@@ -101,7 +104,8 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          load: true
+          load: false
+          push: false
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: ${{ secrets.DOCKER_BUILD_ARGS }}
