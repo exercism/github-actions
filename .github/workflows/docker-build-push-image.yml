@@ -77,7 +77,7 @@ jobs:
           echo "result=${dockerfile_exists}" >> $GITHUB_OUTPUT
       
       - name: Set up Docker
-        uses: docker/setup-docker-action@e61617a16c407a86262fb923c35a616ddbe070b3
+        uses: docker/setup-docker-action@e43656e248c0bd0647d3f5c195d116aacf6fcaf4
         with:
           daemon-config: |
             {
