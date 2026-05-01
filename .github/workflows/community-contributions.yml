@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Detect if user is org member
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
         id: is-organization-member
         with:
           github-token: ${{ secrets.github_membership_token || secrets.GITHUB_TOKEN }}
@@ -38,7 +38,7 @@ jobs:
               .catch(err => false);
       - name: Comment
         if: steps.is-organization-member.outputs.result == 'false'
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
         with:
           script: |
             const isIssue = !!context.payload.issue;
@@ -59,7 +59,7 @@ jobs:
             })
       - name: Close
         if: steps.is-organization-member.outputs.result == 'false'
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
         with:
           script: |
             github.rest.issues.update({
