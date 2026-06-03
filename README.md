@@ -295,5 +295,46 @@ jobs:
     uses: exercism/github-actions/.github/workflows/labels.yml@main
 ```
 
+## Reusable workflow: sorted
+
+The `sorted` reusable workflow checks if the practice exercises on a track are sorted.
+
+### Inputs
+
+The workflow takes a single input, `ordering`, that determines how sorting works.
+The `ordering` input is passed to `sort_by()` and must be a valid JQ path expression.
+A `bucket` key is added to the data, which indicates the difficulty "bucket" or "displayed" difficulty (easy, medium, hard).
+
+Some common ordering values:
+
+* **".name"**: sort alphabetically by the displayed name
+* **".slug"**: sort alphabetically by the slug
+* **".bucket"**: sort by the difficulty bucket (easy, medium, hard)
+* **".bucket, .slug"**: sort by the difficulty bucket then by slug
+* **".difficulty"**: sort by the difficulty value (1, 2, 3, ... 10)
+* **".difficulty, .name"**: sort by the difficulty then by name
+* **".difficulty, .slug"**: sort by the difficulty then by slug
+
+### Example
+
+```yaml
+name: Exercise order
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  call-gha-workflow:
+    name: check
+    uses: exercism/github-actions/.github/workflows/sorted.yml@main
+    with:
+      ordering: ".bucket, .slug"
+```
+
 [configlet]: https://exercism.org/docs/building/configlet
 [configlet-lint]: https://exercism.org/docs/building/configlet/lint
