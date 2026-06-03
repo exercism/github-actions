@@ -299,15 +299,22 @@ jobs:
 
 The `sorted` reusable workflow checks if the practice exercises on a track are sorted.
 
+### Extra fields
+
+Some extra fields are added to the exercise data for sorting.
+
+* `bucket` is added, which indicates the difficulty "bucket" or "displayed" difficulty (easy, medium, hard).
+* `lowercase_name` is added to allow sorting by exercise name, case insensitive.
+
 ### Inputs
 
-The workflow takes a single input, `ordering`, that determines how sorting works.
+The workflow takes a single input, `ordering` (required), that determines how sorting works.
 The `ordering` input is passed to `sort_by()` and must be a valid JQ path expression.
-A `bucket` key is added to the data, which indicates the difficulty "bucket" or "displayed" difficulty (easy, medium, hard).
 
-Some common ordering values:
+Some valid ordering values:
 
 * **".name"**: sort alphabetically by the displayed name
+* **".lowercase_name"**: sort alphabetically (case insensitive) by the displayed name
 * **".slug"**: sort alphabetically by the slug
 * **".bucket"**: sort by the difficulty bucket (easy, medium, hard)
 * **".bucket, .slug"**: sort by the difficulty bucket then by slug

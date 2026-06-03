@@ -30,6 +30,8 @@ jobs:
               .exercises.practice |
               # Add displayed difficulty
               map(.bucket = bucket(.difficulty)) |
+              # Add lowercase name
+              map(.lowercase_name = (.name | ascii_downcase)) |
               # Leave hello-world at the top
               if .[0].slug == "hello-world" then
                 [.[0]] + (.[1:] | sort)
