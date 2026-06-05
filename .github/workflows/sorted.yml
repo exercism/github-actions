@@ -1,0 +1,42 @@
+name: Check practice exercises are sorted
+
+on:
+  workflow_call:
+    inputs:
+      ordering:
+        description: "How exercises are ordered"
+        required: true
+        type: string
+
+jobs:
+  check:
+    name: Check exercises
+    runs-on: ubuntu-slim
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - name: Check if practice exercises are sorted
+        env:
+          ORDERING: ${{ inputs.ordering }}
+        run: |
+          diff <( jq -r '.exercises.practice[].slug' config.json ) <(
+            jq -r '
+              # Bucket by displayed difficulty. 0-3: easy; 4-7: medium; 8-10: hard.
+              def bucket(i): [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3][i];
+
+              # Code injection to inject the sort literal expression.
+              def sort: sort_by('"$ORDERING"');
+
+              .exercises.practice |
+              # Add displayed difficulty
+              map(.bucket = bucket(.difficulty)) |
+              # Add lowercase name
+              map(.lowercase_name = (.name | ascii_downcase)) |
+              # Leave hello-world at the top
+              if .[0].slug == "hello-world" then
+                [.[0]] + (.[1:] | sort)
+              else
+                sort
+              end |
+              map(.slug)[]
+          ' config.json)
