@@ -13,7 +13,7 @@ permissions:
 jobs:
   ping:
     name: Ping team
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Check if repo requires ping
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
