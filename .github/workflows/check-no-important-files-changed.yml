@@ -18,7 +18,7 @@ permissions:
 jobs:
   no_important_files_changed:
     name: No important files changed
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Check if important files changed
         id: check
