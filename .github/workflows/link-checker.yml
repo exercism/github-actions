@@ -6,7 +6,7 @@ on:
 jobs:
   linkChecker:
     if: github.repository_owner == 'exercism'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       issues: write
     steps:
@@ -27,4 +27,3 @@ jobs:
           title: Link Checker Report
           content-filepath: ./lychee/out.md
           labels: report, automated issue
-          
