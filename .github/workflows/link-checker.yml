@@ -1,4 +1,4 @@
-name: Configlet Auto Sync
+name: Check Links
 
 on:
   workflow_call:
