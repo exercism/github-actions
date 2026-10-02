@@ -343,5 +343,31 @@ jobs:
       ordering: ".bucket, .slug"
 ```
 
+## Reusable workflow: link-checker
+
+The `link-checker` reusable workflow calls [Lychee][lychee] and creates an issue if any problematic links are reported.
+
+### Inputs
+
+None.
+
+### Example
+
+To run this on a monthly schedule, in your track repo add this workflow:
+
+```yaml
+name: Check Links
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 0 15 * * # 15th day of each month
+
+jobs:
+  call-gha-workflow:
+    uses: exercism/github-actions/.github/workflow/link-checker.yml@main
+```
+
 [configlet]: https://exercism.org/docs/building/configlet
 [configlet-lint]: https://exercism.org/docs/building/configlet/lint
+[lychee]: https://github.com/lycheeverse/lychee#readme
