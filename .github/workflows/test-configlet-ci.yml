@@ -1,0 +1,26 @@
+name: Test configlet-ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Fetch configlet
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - name: Fetch configlet
+        uses: ./configlet-ci
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Verify configlet is available
+        run: configlet --version
