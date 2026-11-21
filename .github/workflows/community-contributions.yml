@@ -27,7 +27,7 @@ jobs:
         with:
           github-token: ${{ secrets.github_membership_token || secrets.GITHUB_TOKEN }}
           script: |
-            if (context.actor == 'dependabot[bot]' || context.actor == 'exercism-bot' || context.actor == 'github-actions[bot]' || context.actor == 'ihid-assistant[bot]') {
+            if (context.actor == 'dependabot[bot]' || context.actor == 'exercism-bot' || context.actor == 'github-actions[bot]' || context.actor == 'exercism-agent[bot]') {
               return true;
             }
 
