@@ -22,20 +22,24 @@ jobs:
     name: Pause Community Contributions
     runs-on: ubuntu-24.04
     steps:
-      - name: Check if repo has paused community contributions
+      - name: Read the repo's topics
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
-        id: is-paused
+        id: topics
         with:
           script: |
             const response = await github.rest.repos.getAllTopics({
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
+            const topics = response.data.names;
 
-            return response.data.names.includes('community-contributions-paused');
+            core.setOutput('paused', topics.includes('community-contributions-paused'));
+            // A track opts in to accepting approaches and articles with this topic.
+            // Unmaintained tracks have nobody to review them, so they never get the exception.
+            core.setOutput('approaches-and-articles-accepted', topics.includes('approaches-and-articles-accepted') && !topics.includes('unmaintained'));
 
       - name: Check if PR only changes approaches or articles
-        if: steps.is-paused.outputs.result == 'true' && github.event_name == 'pull_request_target'
+        if: steps.topics.outputs.paused == 'true' && steps.topics.outputs.approaches-and-articles-accepted == 'true' && github.event_name == 'pull_request_target'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
         id: only-changes-approaches-or-articles
         with:
@@ -53,7 +57,7 @@ jobs:
             return paths.length > 0 && paths.every(path => pattern.test(path));
 
       - name: Detect if user is org member
-        if: steps.is-paused.outputs.result == 'true' && steps.only-changes-approaches-or-articles.outputs.result != 'true'
+        if: steps.topics.outputs.paused == 'true' && steps.only-changes-approaches-or-articles.outputs.result != 'true'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
         id: is-organization-member
         with:
