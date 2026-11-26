@@ -1,0 +1,30 @@
+# Every track and tooling repo calls this workflow from its own cross-track-maintenance.yml,
+# which org-wide-files keeps in sync. To add an org-wide job, add it here.
+#
+# The caller also runs on comments and reviews. Runs from those events have write access
+# to the repo, so no job here may check out or run code from a PR.
+
+name: Cross-track maintenance
+
+on:
+  workflow_call:
+
+permissions: {}
+
+jobs:
+  ping-cross-track-maintainers:
+    if: github.event_name == 'pull_request_target' && github.event.action == 'opened'
+    permissions:
+      pull-requests: write
+    uses: ./.github/workflows/ping-cross-track-maintainers-team.yml
+    secrets:
+      github_membership_token: ${{ secrets.COMMUNITY_CONTRIBUTIONS_WORKFLOW_TOKEN }}
+
+  pause-community-contributions:
+    if: (github.event_name == 'issues' || github.event_name == 'pull_request_target') && github.event.action == 'opened'
+    permissions:
+      issues: write
+      pull-requests: write
+    uses: ./.github/workflows/community-contributions.yml
+    secrets:
+      github_membership_token: ${{ secrets.COMMUNITY_CONTRIBUTIONS_WORKFLOW_TOKEN }}

@@ -4,9 +4,10 @@ on:
   workflow_call:
     inputs:
       forum_category:
-        description: "The forum category used in the 'open a new topic' link"
-        required: true
+        description: "The forum category used in the 'open a new topic' link. Defaults to the track slug, taken from the repo name."
+        required: false
         type: string
+        default: ""
     secrets:
       github_membership_token:
         description: "The github token used to check org membership with"
@@ -21,7 +22,42 @@ jobs:
     name: Pause Community Contributions
     runs-on: ubuntu-24.04
     steps:
+      - name: Read the repo's topics
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+        id: topics
+        with:
+          script: |
+            const response = await github.rest.repos.getAllTopics({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            const topics = response.data.names;
+
+            core.setOutput('paused', topics.includes('community-contributions-paused'));
+            // A track opts in to accepting approaches and articles with this topic.
+            // Unmaintained tracks have nobody to review them, so they never get the exception.
+            core.setOutput('approaches-and-articles-accepted', topics.includes('approaches-and-articles-accepted') && !topics.includes('unmaintained'));
+
+      - name: Check if PR only changes approaches or articles
+        if: steps.topics.outputs.paused == 'true' && steps.topics.outputs.approaches-and-articles-accepted == 'true' && github.event_name == 'pull_request_target'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+        id: only-changes-approaches-or-articles
+        with:
+          script: |
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              per_page: 100,
+            });
+
+            const pattern = /^exercises\/[^\/]+\/[^\/]+\/\.(approaches|articles)\//;
+            const paths = files.flatMap(file => [file.filename, file.previous_filename].filter(Boolean));
+
+            return paths.length > 0 && paths.every(path => pattern.test(path));
+
       - name: Detect if user is org member
+        if: steps.topics.outputs.paused == 'true' && steps.only-changes-approaches-or-articles.outputs.result != 'true'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
         id: is-organization-member
         with:
@@ -39,13 +75,16 @@ jobs:
       - name: Comment
         if: steps.is-organization-member.outputs.result == 'false'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+        env:
+          FORUM_CATEGORY: ${{ inputs.forum_category }}
         with:
           script: |
             const isIssue = !!context.payload.issue;
             const subject = context.payload.issue || context.payload.pull_request;
             const thing = (isIssue ? 'issue' : 'PR');
             const aThing = (isIssue ? 'an issue' : 'a PR');
-            const forumCategory = '${{ inputs.forum_category }}'
+            // Tooling repos share their track's category, so strip the tooling suffix from the repo name
+            const forumCategory = process.env.FORUM_CATEGORY || context.repo.repo.replace(/-(test-runner|analyzer|representer)$/, '');
             const link = `https://forum.exercism.org/new-topic?title=${encodeURI(subject.title)}&body=${encodeURI(subject.body)}&category=${encodeURI(forumCategory)}`
             const body = isIssue
               ? `Hello. Thanks for opening an issue on Exercism 🙂\n\nAt Exercism we use our Community Forum, not GitHub issues, as the primary place for discussion. That allows maintainers and contributors from across Exercism's ecosystem to discuss your problems/ideas/suggestions without them having to subscribe to hundreds of repositories.\n\nThis issue will be automatically closed. Please use [this link](${link} ) to copy your GitHub Issue into a new topic on the forum, where we look forward to chatting with you!\n\nIf you're interested in learning more about this auto-responder, please read [this blog post](https://exercism.org/blog/contribution-guidelines-nov-2023).`
